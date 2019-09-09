@@ -4,7 +4,7 @@ import numpy as np
 # Keeps track of how full the roster is and what positions you have
 # Also has total points, current standings, and points for the week
 
-class team_roster():
+class ffTeam():
 
 	def __init__(self, name):
 		self.name = name
@@ -15,8 +15,10 @@ class team_roster():
 		self.tracker={'WR': 0, 'RB': 0, 
 					'QB' : 0, 'TE' : 0, 
 					'DST' : 0, 'K': 0}
+		self.roster = {'WR': None, 'RB': None, 
+					'QB' : None, 'TE' : None, 
+					'DST' : None, 'K': None}
 		self.full = False
-		self.roster = list()
 		self.wins = 0
 		self.losses = 0
 		self.total_points = 0
