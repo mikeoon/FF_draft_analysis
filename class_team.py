@@ -12,12 +12,12 @@ class ffTeam():
 					'QB' : 2, 'TE' : 2, 
 					'DST' : 2, 'K': 2,
 					'FLEX' : 2}
-		self.tracker={'WR': 0, 'RB': 0, 
+		self.count={'WR': 0, 'RB': 0, 
 					'QB' : 0, 'TE' : 0, 
 					'DST' : 0, 'K': 0}
-		self.roster = {'WR': None, 'RB': None, 
-					'QB' : None, 'TE' : None, 
-					'DST' : None, 'K': None}
+		self.roster = {'WR': [], 'RB': [], 
+					'QB' : [], 'TE' : [], 
+					'DST' : [], 'K': []}
 		self.full = False
 		self.wins = 0
 		self.losses = 0
@@ -38,17 +38,23 @@ class ffTeam():
 		return len(self.roster)
 
 	def add_roster(self, player):
-		self.roster.append(player)
-		pos = player.get_pos
-		if self.tracker[pos] != 0:
+		flex_pos = ['WR', 'RB', 'TE']
+		pos = player.get_pos()
+		if not self.is_posfull(pos):
 			self.tracker[pos] -= 1
-			self.count[pos] += 1
-		else:
+		elif pos in flex_pos and not self.is_posfull('FLEX'): 
 			self.tracker['FLEX'] -= 1
+			
+		self.count[pos] += 1
+
+		self.roster[pos].append(player)
 		player.set_ffteam(self.name)
 
 	def is_rosterfull(self):
 		return(sum(self.tracker.values()) == 0)
+
+	def is_posfull(self, pos):
+		return self.tracker[pos] == 0
 
 	def get_wins(self):
 		return self.wins
