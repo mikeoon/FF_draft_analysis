@@ -15,8 +15,10 @@ class createLeague():
 		self.dorder = None
 		self.team_names = None
 		self.year = int(year)
-		self.ppts = None
+		self.ppts = self.read_in_season_points(year)
 		self.starting = ['QB', 'WR', 'WR', 'RB', 'RB', 'TE', 'DST', 'K']
+		# Standings are in form [W, L, T]
+		self.standings = None
 
 
 
@@ -31,9 +33,12 @@ class createLeague():
 # Default is the minium which is set to 8
 	def create_teams(self, num=8):
 		self.num_teams = num
+		self.standings = {}
 		for n in range(num):
 			self.league[f'team{n+1}'] = team.ffTeam(f'team{n+1}')
+			self.standings[f'team{n+1}'] = [0, 0, 0]
 		self.team_names = list(self.league.keys())
+
 
 # Returns the team names in the league
 	def get_teamnames(self):
@@ -88,12 +93,16 @@ class createLeague():
 				return False
 		return True
 
-# Sims the regular season weeks 1 - 13
-	def sim_regseason(self):
-		ppts = self.read_in_season_points(self.year)
-		div1 = self.team_names[:4]
-		div2 = self.team_names[4:]
-		# just for week 1
+# Returns a list of standings, not ordered
+	def get_standings(self):
+		return [(team, record) for team, record in self.standings.items()]
+
+
+# Sims 1 matchup, pass in the matchups via two lists
+	def sim_matchup(self, div1, div2, wk):
+		
+		# just for one week
+		# Hard coded to just take in a player off the top, no algorithm for it yet
 		for a, b in zip(div1, div2):
 			a_score, b_score = 0, 0
 			a_roster, b_roster = [], []
@@ -103,49 +112,75 @@ class createLeague():
 				pa = self.league[a].get_player(pos)
 				pb = self.league[b].get_player(pos)
 
-				week = ppts['w1']
+				week = self.ppts[f'w{wk}']
+
 				pas = week[week['Player'] == pa.get_name()]
 				pbs = week[week['Player'] == pb.get_name()]
 
 
-				if pas['Player'].count() == 0:
-					pa = self.league[a].get_player(pos, True)
+				if pas['Player'].count() == 0 or pa.get_name() in a_roster:
+					pa = self.league[a].get_player(pos, False)
 					pas = week[week['Player'] == pa.get_name()]
 
-				if pbs['Player'].count() == 0:
-					pb = self.league[b].get_player(pos, True)
+				if pbs['Player'].count() == 0 or pa.get_name() in a_roster:
+					pb = self.league[b].get_player(pos, False)
 					pbs = week[week['Player'] == pb.get_name()]
 
 				
 				a_score, b_score = a_score + pas['Points'].iloc[0], b_score + pbs['Points'].iloc[0]
 				
+			# Creating roster to save for the teams per matchup
 				a_roster.append((pas['Player'].iloc[0], pas['Points'].iloc[0]))
 				b_roster.append((pbs['Player'].iloc[0], pbs['Points'].iloc[0]))
 
+			# Tracking point totals for that player
 				pa.add_points(pas['Points'].iloc[0])
 				pb.add_points(pbs['Points'].iloc[0])
 
+
+		# Right now, hard coded to favor team B if the sores are equal
 			if a_score > b_score:
+				self.league[a].add_win()
+				self.standings[a][0] += 1
+				self.standings[b][1] += 1
 				winner = a
 			else:
+				self.league[b].add_win()
+				self.standings[a][1] += 1
+				self.standings[b][0] += 1
 				winner = b
 
-			print(f'{a} vs {b}')
-			print(f'This is for team {a}:')
+
+		# Sets the score for that week within the team
+			self.league[a].set_weekscore(a_score, wk)
+			self.league[b].set_weekscore(b_score, wk)
+
+		# Sets the roster for that week within the team
+			self.league[a].record_lineup(a_roster, wk)
+			self.league[b].record_lineup(b_roster, wk)
+
+		# Clear team's counts so it can count for another matchup
+			self.league[a].clear_count()
+			self.league[b].clear_count()
+
+		# Helper print messages to see one matchup
+			print(f'This is {a} vs {b}')
+			print(f'{a}')
 			print(f'Score: {a_score}')
-			print(f'Roster: {a_roster}')
-			print(len(a_roster))
+			print(f'Lineup: {a_roster}')
 			print()
-			print(f'This is for team{b}:')
+			print(f'{b}')
 			print(f'Score: {b_score}')
-			print(f'Roster: {b_roster}')
-			print(len(b_roster))
-			print(f'The winner is: {winner}')
+			print(f'Lineup: {b_roster}')
+			print(f'Winner is: {winner}')
 			print()
 
 
 
+		
 
+
+# Reads in preaseason ranking data
 	def read_in_season_points(self, season, weeks=17):
 		season_data = {}
 

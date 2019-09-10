@@ -24,7 +24,7 @@ class ffTeam():
 		self.losses = 0
 		self.total_points = 0
 		self.standing = None
-		self.week_score = None
+		self.week_score = {}
 
 # Returns name of team
 	def get_name(self):
@@ -40,10 +40,7 @@ class ffTeam():
 		for key, values in self.roster.items():
 			readable_roster[key] = [str(v) for v in values]
 		return readable_roster
-			
-# Returns how many players are on the roster
-	def get_rostercount(self):
-		return sum(self.count.values())
+
 
 # Adds a ffPlayer to the team's roster
 # Updates the teams tracker and count
@@ -55,22 +52,29 @@ class ffTeam():
 		elif pos in flex_pos and not self.is_posfull('FLEX'): 
 			self.tracker['FLEX'] -= 1
 
-		self.count[pos] += 1
-
 		self.roster[pos].append(player)
 		player.set_ffteam(self.name)
 
-
-	def get_player(self, pos, rankhigh=False):
-		if not rankhigh:
-			return self.roster[pos][0]
+# Returns player from the roster, best available
+	def get_player(self, pos, playing=True):
+		slot = self.count[pos]
+		if playing:
+			self.count[pos]+=1
+			return self.roster[pos][slot]
 		else:
-			return self.roster[pos][1]
+			self.count[pos]+=1
+			return self.roster[pos][len(self.roster[pos]) - 1]
+		
+	def clear_count(self):
+		self.count ={'WR': 0, 'RB': 0, 
+					'QB' : 0, 'TE' : 0, 
+					'DST' : 0, 'K': 0}
 
+# Saves the lineup for that week, key=wkx, value=list of players
 	def record_lineup(self, lineup, wk):
 		self.lineups[f'wk{wk}'] = lineup
 
-
+# Returns the lineups for all weeks
 	def get_lineups(self):
 		for values in self.lineups.values():
 			return [v.get_name() for v in values]
@@ -87,18 +91,31 @@ class ffTeam():
 	def get_wins(self):
 		return self.wins
 
+# Adds a win for the team
+	def add_win(self):
+		self.wins+=1
+
 # Returns number of losses for team
 	def get_losses(self):
 		return self.losses
 
+# Adds loss for the team
+	def add_loss(self):
+		self.wins+=1
+
 # Returns total points scored for the team
 	def get_totalpoints(self):
-		return self.total_points
+		return sum(self.week_score.values())
 
 # Returns points for that week
 	def get_weekscore(self):
 		return self.week_score
 		
+# Sets the score for the given week
+	def set_weekscore(self, score,  wk):
+		self.week_score[f'wk{wk}'] = score
+
+
 # Returns the standing of the team
 	def get_standing(self):
 		return self.standing
