@@ -25,18 +25,27 @@ class ffTeam():
 		self.standing = None
 		self.week_score = None
 
+# Returns name of team
 	def get_name(self):
 		return self.name
 
+# Sets the name of the team
 	def set_name(self, name):
 		self.name = name
 
+# Returns a readable, printable list of players for each position
 	def get_roster(self):
-		return self.roster
-
+		readable_roster = {}
+		for key, values in self.roster.items():
+			readable_roster[key] = [str(v) for v in values]
+		return readable_roster
+			
+# Returns how many players are on the roster
 	def get_rostercount(self):
-		return len(self.roster)
+		return sum(self.count.values())
 
+# Adds a ffPlayer to the team's roster
+# Updates the teams tracker and count
 	def add_roster(self, player):
 		flex_pos = ['WR', 'RB', 'TE']
 		pos = player.get_pos()
@@ -44,30 +53,37 @@ class ffTeam():
 			self.tracker[pos] -= 1
 		elif pos in flex_pos and not self.is_posfull('FLEX'): 
 			self.tracker['FLEX'] -= 1
-			
+
 		self.count[pos] += 1
 
 		self.roster[pos].append(player)
 		player.set_ffteam(self.name)
 
+# Returns if the roster is full, True = full
 	def is_rosterfull(self):
 		return(sum(self.tracker.values()) == 0)
 
+# Returns if the pos is filled for this team, True = filled
 	def is_posfull(self, pos):
 		return self.tracker[pos] == 0
 
+# Returns number of wins for team
 	def get_wins(self):
 		return self.wins
 
+# Returns number of losses for team
 	def get_losses(self):
 		return self.losses
 
+# Returns total points scored for the team
 	def get_totalpoints(self):
 		return self.total_points
 
+# Returns points for that week
 	def get_weekscore(self):
 		return self.week_score
-
+		
+# Returns the standing of the team
 	def get_standing(self):
 		return self.standing
 

@@ -12,17 +12,26 @@ class ffPlayer():
 		self.rank = rank
 		self.ff_team = None
 
+# Makes player readable, just name
+	def __str__(self):
+		return f'{self.name}'
+
+# Returns the name of the player
 	def get_name(self):
 		return self.name
 
+# Returns the position of the player
 	def get_pos(self):
 		return self.pos
 
+# Returns the rank of that player (Predraft)
 	def get_rank(self):
 		return self.rank
 
+# Returns what team that player is on
 	def set_ffteam(self, ff_team):
 		self.ff_team = ff_team
+
 
 
 
