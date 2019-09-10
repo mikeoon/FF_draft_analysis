@@ -14,6 +14,9 @@ class createLeague():
 		self.rankings = self.get_ranks(year)
 		self.dorder = None
 		self.team_names = None
+		self.year = int(year)
+		self.ppts = None
+		self.starting = ['QB', 'WR', 'WR', 'RB', 'RB', 'TE', 'DST', 'K']
 
 
 
@@ -84,6 +87,51 @@ class createLeague():
 			if not self.league[key].is_rosterfull():
 				return False
 		return True
+
+# Sims the regular season weeks 1 - 13
+	def sim_regseason(self):
+		ppts = self.read_in_season_points(self.year)
+		div1 = self.team_names[:4]
+		div2 = self.team_names[4:]
+		# just for week 1
+		for a, b in zip(div1, div2):
+			a_score = 0
+			b_score = 0
+			for pos in self.starting:
+
+				pa = self.league[a].get_player(pos)
+				pb = self.league[b].get_player(pos)
+				print(pa.get_name())
+				print(pb.get_name())
+
+				week = ppts['w1']
+				pa = week[week['Player'] == pa.get_name()]
+				pb = week[week['Player'] == pb.get_name()]
+
+				print(pa['Player'],pa['Points'])
+				print(pb['Player'], pb['Points'])
+				print()
+
+
+
+
+
+
+	def read_in_season_points(self, season, weeks=17):
+		season_data = {}
+		print(season)
+
+		for w in range(1, weeks+1):
+			week = pd.read_csv(f'data/points_20{season}/wk{w}_points.csv')
+			week.drop(columns=['Rank', 'Avg', 'Games'], inplace=True)
+			season_data[f'w{w}'] = week
+
+		return season_data	
+
+	
+
+
+
 
 
 

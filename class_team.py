@@ -59,6 +59,15 @@ class ffTeam():
 		self.roster[pos].append(player)
 		player.set_ffteam(self.name)
 
+
+	def get_player(self, pos, rankhigh=False):
+		if not rankhigh:
+			return self.roster[pos][0]
+		else:
+			for p in self.roster[pos]:
+				return(p.get_rank())
+
+
 # Returns if the roster is full, True = full
 	def is_rosterfull(self):
 		return(sum(self.tracker.values()) == 0)
