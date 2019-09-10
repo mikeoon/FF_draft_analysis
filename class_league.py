@@ -117,16 +117,19 @@ class createLeague():
 				pas = week[week['Player'] == pa.get_name()]
 				pbs = week[week['Player'] == pb.get_name()]
 
-
+				print(pa)
+				print(pb)
 				if pas['Player'].count() == 0 or pa.get_name() in a_roster:
 					pa = self.league[a].get_player(pos, False)
 					pas = week[week['Player'] == pa.get_name()]
 
-				if pbs['Player'].count() == 0 or pa.get_name() in a_roster:
+				if pbs['Player'].count() == 0 or pb.get_name() in b_roster:
 					pb = self.league[b].get_player(pos, False)
 					pbs = week[week['Player'] == pb.get_name()]
 
-				
+				print(pa)
+				print(pb)
+				print()
 				a_score, b_score = a_score + pas['Points'].iloc[0], b_score + pbs['Points'].iloc[0]
 				
 			# Creating roster to save for the teams per matchup
@@ -164,6 +167,8 @@ class createLeague():
 			self.league[b].clear_count()
 
 		# Helper print messages to see one matchup
+		# Delete when running through them all
+		'''
 			print(f'This is {a} vs {b}')
 			print(f'{a}')
 			print(f'Score: {a_score}')
@@ -174,7 +179,7 @@ class createLeague():
 			print(f'Lineup: {b_roster}')
 			print(f'Winner is: {winner}')
 			print()
-
+		'''
 
 
 		
@@ -191,7 +196,6 @@ class createLeague():
 
 		return season_data	
 
-	
 
 
 
