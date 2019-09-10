@@ -18,6 +18,7 @@ class ffTeam():
 		self.roster = {'WR': [], 'RB': [], 
 					'QB' : [], 'TE' : [], 
 					'DST' : [], 'K': []}
+		self.lineups= {}
 		self.full = False
 		self.wins = 0
 		self.losses = 0
@@ -64,9 +65,15 @@ class ffTeam():
 		if not rankhigh:
 			return self.roster[pos][0]
 		else:
-			for p in self.roster[pos]:
-				return(p.get_rank())
+			return self.roster[pos][1]
 
+	def record_lineup(self, lineup, wk):
+		self.lineups[f'wk{wk}'] = lineup
+
+
+	def get_lineups(self):
+		for values in self.lineups.values():
+			return [v.get_name() for v in values]
 
 # Returns if the roster is full, True = full
 	def is_rosterfull(self):

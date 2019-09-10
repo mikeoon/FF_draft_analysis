@@ -16,7 +16,6 @@ def read_in_season_points(season, weeks=17):
 	return season_data
 
 
-print(read_in_season_points(16)['w1'].info())
 
 
 

@@ -11,6 +11,7 @@ class ffPlayer():
 		self.team = team
 		self.rank = rank
 		self.ff_team = None
+		self.point_total = 0
 
 # Makes player readable, just name
 	def __str__(self):
@@ -31,6 +32,15 @@ class ffPlayer():
 # Returns what team that player is on
 	def set_ffteam(self, ff_team):
 		self.ff_team = ff_team
+
+# Adds to player's point total for the season
+	def add_points(self, pts):
+		self.point_total += pts
+
+# Returns player's point total up to a point
+	def get_pointtotal(self):
+		return self.point_total
+
 
 
 

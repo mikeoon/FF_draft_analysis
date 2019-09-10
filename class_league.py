@@ -95,31 +95,59 @@ class createLeague():
 		div2 = self.team_names[4:]
 		# just for week 1
 		for a, b in zip(div1, div2):
-			a_score = 0
-			b_score = 0
+			a_score, b_score = 0, 0
+			a_roster, b_roster = [], []
+
 			for pos in self.starting:
 
 				pa = self.league[a].get_player(pos)
 				pb = self.league[b].get_player(pos)
-				print(pa.get_name())
-				print(pb.get_name())
 
 				week = ppts['w1']
-				pa = week[week['Player'] == pa.get_name()]
-				pb = week[week['Player'] == pb.get_name()]
-
-				print(pa['Player'],pa['Points'])
-				print(pb['Player'], pb['Points'])
-				print()
+				pas = week[week['Player'] == pa.get_name()]
+				pbs = week[week['Player'] == pb.get_name()]
 
 
+				if pas['Player'].count() == 0:
+					pa = self.league[a].get_player(pos, True)
+					pas = week[week['Player'] == pa.get_name()]
+
+				if pbs['Player'].count() == 0:
+					pb = self.league[b].get_player(pos, True)
+					pbs = week[week['Player'] == pb.get_name()]
+
+				
+				a_score, b_score = a_score + pas['Points'].iloc[0], b_score + pbs['Points'].iloc[0]
+				
+				a_roster.append((pas['Player'].iloc[0], pas['Points'].iloc[0]))
+				b_roster.append((pbs['Player'].iloc[0], pbs['Points'].iloc[0]))
+
+				pa.add_points(pas['Points'].iloc[0])
+				pb.add_points(pbs['Points'].iloc[0])
+
+			if a_score > b_score:
+				winner = a
+			else:
+				winner = b
+
+			print(f'{a} vs {b}')
+			print(f'This is for team {a}:')
+			print(f'Score: {a_score}')
+			print(f'Roster: {a_roster}')
+			print(len(a_roster))
+			print()
+			print(f'This is for team{b}:')
+			print(f'Score: {b_score}')
+			print(f'Roster: {b_roster}')
+			print(len(b_roster))
+			print(f'The winner is: {winner}')
+			print()
 
 
 
 
 	def read_in_season_points(self, season, weeks=17):
 		season_data = {}
-		print(season)
 
 		for w in range(1, weeks+1):
 			week = pd.read_csv(f'data/points_20{season}/wk{w}_points.csv')
