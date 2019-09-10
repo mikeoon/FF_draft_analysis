@@ -78,7 +78,7 @@ class createLeague():
 				self.league[team].add_roster(p.ffPlayer(pick['player'].iloc[0], pick['pos'].iloc[0], pick['team'].iloc[0], pick['rank'].iloc[0]))
 				self.rankings.drop(pick.index, inplace=True)
 
-
+# Checks to see if draft is complete, True = Complete, all team rosters full
 	def complete_draft(self):
 		for key in self.league.keys():
 			if not self.league[key].is_rosterfull():
