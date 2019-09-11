@@ -6,15 +6,20 @@ from bs4 import BeautifulSoup
 
 
 # scrapes Fantasy football calculator for ADP for the below years
+#https://fantasyfootballcalculator.com
 # Batch so turn it off if you need to
+# 2019 is current, which is a different url as the others so will come up as adp_.csv
 
-years = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+years = ['/2007', '/2008', '/2009', '/2010', '/2011', '/2012',
+		'/2013', '/2014', '/2015', '/2016', '/2017', '/2018', '']
 
 for y in years:
-	adp = f'https://fantasyfootballcalculator.com/adp/ppr/12-team/all/20{y}'
+	adp = f'https://fantasyfootballcalculator.com/adp/standard/12-team/all{y}'
 	r = requests.get(adp)
 
-	print(r)
+
+
+	print(f'Status for {y[1:]}: {r}')
 	print()
 
 
@@ -45,9 +50,9 @@ for y in years:
 
 	result_df = pd.DataFrame(all_rows)
 
-	result_df.to_csv(f'data/adp/adp_20{y}.csv', index=False)
+	result_df.to_csv(f'data/std_adp/adp__{y[1:]}.csv', index=False)
 
-	print(f'done with 20{y}')
+	print(f'done with {y[1:]}')
 
 
 
