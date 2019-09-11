@@ -41,6 +41,3 @@ def read_in_season_points(season, weeks=17):
 
 
 
-
-
-

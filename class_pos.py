@@ -5,11 +5,12 @@ import numpy as np
 #and which ff team they are on
 
 class ffPlayer():
-	def __init__(self, name, pos, team, rank):
+	def __init__(self, name, pos, team, rank, bye):
 		self.name = name
 		self.pos = pos
 		self.team = team
 		self.rank = rank
+		self.bye = bye
 		self.ff_team = None
 		self.point_total = 0
 
@@ -40,6 +41,9 @@ class ffPlayer():
 # Returns player's point total up to a point
 	def get_pointtotal(self):
 		return self.point_total
+
+	def get_bye(self):
+		return self.bye
 
 
 

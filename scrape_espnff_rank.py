@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 
 
 
-espn = 'https://www.espn.com/fantasy/football/story/_/id/12866396/top-300-rankings-2015'
+espn = 'https://www.espn.com/fantasy/football/story/_/id/16287927/2016-fantasy-football-rankings-top-300'
 r = requests.get(espn)
 
 print(r)
@@ -38,7 +38,7 @@ ranks = plist.find_all('tr', {'class' : 'last'})
 #all_rows = pd.DataFrame(columns=['rank', 'player', 'team', 'pos'])
 all_rows=[]
 
-empty_row = {'rank': None, 'player' : None, 'team' : None, 'pos' : None}
+empty_row = {'rank': None, 'player' : None, 'team' : None, 'pos' : None, 'bye' : None}
 
 for i in ranks:
 	copy_erow = copy.copy(empty_row)
@@ -53,6 +53,8 @@ for i in ranks:
 
 	copy_erow['team'] = pr[1].string
 	copy_erow['pos'] = pr[2].string
+	copy_erow['bye'] = pr[3].string
+
 
 # This is for 2015 pre season rankings, formatted differently 
 	'''
@@ -67,7 +69,7 @@ for i in ranks:
 scrape_result=pd.DataFrame(all_rows)
 
 
-scrape_result.to_csv('data/pre_draft_rank/espn_rankings_15.csv', index=False)
+scrape_result.to_csv('data/pre_draft_rank/espn_rankings_16_BYE.csv', index=False)
 
 print('done')
 

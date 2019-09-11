@@ -26,7 +26,7 @@ class createLeague():
 
 # Reads in CSV file of predraft/season ranks
 	def get_ranks(self, year):
-		return pd.read_csv(f'data/pre_draft_rank/espn_rankings_{year}.csv')
+		return pd.read_csv(f'data/pre_draft_rank/espn_rankings_{year}_BYE.csv')
 		
 
 # Creates the number of teams in the league from specified number
@@ -83,7 +83,8 @@ class createLeague():
 
 				pick = self.rankings[self.rankings['pos'] == pi]
 				pick = pick[pick['rank'] == pick['rank'].min()]
-				self.league[team].add_roster(p.ffPlayer(pick['player'].iloc[0], pick['pos'].iloc[0], pick['team'].iloc[0], pick['rank'].iloc[0]))
+				self.league[team].add_roster(p.ffPlayer(pick['player'].iloc[0], pick['pos'].iloc[0], pick['team'].iloc[0], 
+														pick['rank'].iloc[0], pick['bye'].iloc[0]))
 				self.rankings.drop(pick.index, inplace=True)
 
 # Checks to see if draft is complete, True = Complete, all team rosters full
@@ -100,9 +101,7 @@ class createLeague():
 
 # Sims 1 matchup, pass in the matchups via two lists
 	def sim_matchup(self, div1, div2, wk):
-		
-		# just for one week
-		# Hard coded to just take in a player off the top, no algorithm for it yet
+	# Hard coded to just take in a player off the top, no algorithm for it yet
 		for a, b in zip(div1, div2):
 			a_score, b_score = 0, 0
 			a_roster, b_roster = [], []
@@ -117,8 +116,7 @@ class createLeague():
 				pas = week[week['Player'] == pa.get_name()]
 				pbs = week[week['Player'] == pb.get_name()]
 
-				print(pa)
-				print(pb)
+			# This is hard coded to players that are injured
 				if pas['Player'].count() == 0 or pa.get_name() in a_roster:
 					pa = self.league[a].get_player(pos, False)
 					pas = week[week['Player'] == pa.get_name()]
@@ -127,9 +125,20 @@ class createLeague():
 					pb = self.league[b].get_player(pos, False)
 					pbs = week[week['Player'] == pb.get_name()]
 
-				print(pa)
-				print(pb)
-				print()
+			# add new player
+				while pas['Player'].count() == 0 or pa.get_name() in a_roster:
+					self.league[a].drop_player(pa)
+					self.replace_player(pa.get_pos(), a)
+					pa = self.league[a].get_player(pos)
+					pas = week[week['Player'] == pb.get_name()]
+
+
+				while pbs['Player'].count() == 0 or pb.get_name() in b_roster:
+					self.league[b].drop_player(pb)
+					self.replace_player(pa.get_pos(), b)
+					pb = self.league[b].get_player(pos)
+					pbs = week[week['Player'] == pb.get_name()]
+
 				a_score, b_score = a_score + pas['Points'].iloc[0], b_score + pbs['Points'].iloc[0]
 				
 			# Creating roster to save for the teams per matchup
@@ -196,6 +205,26 @@ class createLeague():
 
 		return season_data	
 
+	def replace_player(self, pos, team):
+		pick = self.rankings[self.rankings['pos'] == pos]
+		replace = pick[pick['rank'] == pick['rank'].min()]
+		self.league[team].add_roster(p.ffPlayer(replace['player'].iloc[0], replace['pos'].iloc[0], replace['team'].iloc[0],
+												replace['rank'].iloc[0], replace['bye'].iloc[0]))
+		self.rankings.drop(replace.index, inplace=True)
+
+
+	def report_replaced(self):
+		report = []
+		for team, roster in self.league.items():
+			inj = roster.get_injuries()
+			report.append(f'{team} replaced {inj}')
+		return report
+
+	def get_byes(self):
+		byes = []
+		for team, roster in self.league.items():
+			byes.append((team, roster.get_byes()))
+		return byes
 
 
 

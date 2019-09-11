@@ -25,6 +25,8 @@ class ffTeam():
 		self.total_points = 0
 		self.standing = None
 		self.week_score = {}
+		self.injury = []
+		self.byes = {}
 
 # Returns name of team
 	def get_name(self):
@@ -43,7 +45,7 @@ class ffTeam():
 
 
 # Adds a ffPlayer to the team's roster
-# Updates the teams tracker and count
+# Updates the teams tracker, count, and byes
 	def add_roster(self, player):
 		flex_pos = ['WR', 'RB', 'TE']
 		pos = player.get_pos()
@@ -54,6 +56,15 @@ class ffTeam():
 
 		self.roster[pos].append(player)
 		player.set_ffteam(self.name)
+		self.byes[player.get_bye()] = player.get_name()
+
+# Drops player from roster, so far for just injury
+	def drop_player(self, player):
+		self.tracker[player.get_pos()] += 1
+		self.count[player.get_pos()] -= 1
+		self.injury.append(player)
+		self.roster[player.get_pos()].remove(player)
+
 
 # Returns player from the roster, best available
 	def get_player(self, pos, playing=True):
@@ -115,16 +126,16 @@ class ffTeam():
 	def set_weekscore(self, score,  wk):
 		self.week_score[f'wk{wk}'] = score
 
-
 # Returns the standing of the team
 	def get_standing(self):
 		return self.standing
 
-		
+# Returns the names of those replaced, hopefully by injury
+	def get_injuries(self):
+		return [i.get_name() for i in self.injury]
 
-
-
-
+	def get_byes(self):
+		return self.byes
 
 
 
