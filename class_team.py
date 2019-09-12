@@ -27,6 +27,8 @@ class ffTeam():
 		self.week_score = {}
 		self.injury = []
 		self.byes = {}
+		self.dft_picks = []
+		self.dft_pos = None
 
 # Returns name of team
 	def get_name(self):
@@ -35,6 +37,15 @@ class ffTeam():
 # Sets the name of the team
 	def set_name(self, name):
 		self.name = name
+
+# Sets the draft order for the team
+	def set_dftpicks(self, picks):
+		self.dft_picks = picks
+
+# Sets the draft poition for the team
+	def set_dftpos(self, pos):
+		self.dft_pos = pos
+
 
 # Returns a readable, printable list of players for each position
 	def get_roster(self):
@@ -125,6 +136,9 @@ class ffTeam():
 # Sets the score for the given week
 	def set_weekscore(self, score,  wk):
 		self.week_score[f'wk{wk}'] = score
+
+	def set_standing(self, stnd):
+		self.standing = stnd
 
 # Returns the standing of the team
 	def get_standing(self):

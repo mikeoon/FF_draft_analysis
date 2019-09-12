@@ -3,6 +3,7 @@ import pandas as pd
 import random as rand
 import class_team as team
 import class_pos as p
+import copy
 
 
 class createLeague():
@@ -108,7 +109,21 @@ class createLeague():
 
 # Returns a list of standings, not ordered
 	def get_standings(self):
-		return [(team, record) for team, record in self.standings.items()]
+		win_totals = {}
+		stnd_results = []
+		empty_row = {'team':None, 'W':None, 'L':None, 'T':None}
+		for team, record in self.standings.items():
+			new_row = copy.copy(empty_row)
+			new_row['team'] = team
+			new_row['W'] = record[0]
+			new_row['L'] = record[1]
+			new_row['T'] = record[2]
+			stnd_results.append(new_row)
+		return pd.DataFrame(stnd_results).sort_values('W', ascending=False)
+
+	def get_records(self):
+		return [(team, record) for team,record in self.standings.items()]
+
 
 	def get_pttotals(self):
 		totals = []

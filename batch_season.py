@@ -27,6 +27,12 @@ wk11 = (['team1', 'team2', 'team5', 'team6'], ['team3', 'team4', 'team7', 'team8
 wk12 = (['team1', 'team2', 'team5', 'team6'], ['team4', 'team3', 'team8', 'team7'])
 wk13 = (['team1', 'team3', 'team5', 'team7'], ['team2', 'team4', 'team6', 'team8'])
 
+
+['WR','WR', 'WR', 'WR', 'RB', 'RB', 'RB', 'RB', 'QB','QB', 'TE', 'TE', 'DST', 'K', 'DST', 'K']
+
+
+
+
 def sim_seasons(year, name_sim='default', num_sim=1):
 	schedule = [wk1, wk2, wk3, wk4, wk5, wk6, wk7, wk8, wk9, wk10, wk11, wk12, wk13]
 	sim_data = []
@@ -41,14 +47,21 @@ def sim_seasons(year, name_sim='default', num_sim=1):
 			season.sim_matchup(wk[0], wk[1], week)
 			week+=1
 
-		empty_row = {'team':None, 'W':None, 'L':None, 'total_points':None}
-		# Standings are in form [W, L, T]
-		for team in zip(season.get_standings(), season.get_pttotals()):
+		season_stnd = season.get_standings().reset_index()
+		empty_row = {'team':None, 'W':None, 'L':None, 'T':None, 'total_points':None, 'stnd':None}
+
+		# Records for teams are in form [W, L, T]
+		for team in season.get_pttotals():
 			new_row = copy.copy(empty_row)
-			new_row['team'] = team[0][0]
-			new_row['W'] = team[0][1][0]
-			new_row['L'] = team[0][1][1]
-			new_row['total_points'] = team[1][1]
+			record = season_stnd[season_stnd['team'] == team[0]]
+
+			new_row['team'] = team[0]
+			new_row['W'] = record['W'].iloc[0]
+			new_row['L'] = record['L'].iloc[0]
+			new_row['T'] = record['T'].iloc[0]
+			new_row['stnd'] = record.index[0]
+			new_row['total_points'] = team[1]
+
 			sim_data.append(pd.Series(new_row))
 		print(f'Sim {_} complete')
 

@@ -7,7 +7,8 @@ def read_adp_csv(year):
 
 
 
-
+def read_leaders_csv(year):
+	return pd.read_csv(f'data/leaders_points/{year}_leaders.csv')
 
 
 
