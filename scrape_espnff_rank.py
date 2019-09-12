@@ -12,18 +12,19 @@ from bs4 import BeautifulSoup
 
 
 
-espn = 'https://www.espn.com/fantasy/football/story/_/id/16287927/2016-fantasy-football-rankings-top-300'
+espn = 'https://www.espn.com/fantasy/football/story/_/page/18RanksPreseason300nonPPR/2018-fantasy-football-non-ppr-rankings-top-300'
 r = requests.get(espn)
 
 print(r)
 print()
-'''
-client = MongoClient('localhost', 27017)
-db = client.espn_mbarry
-pages = db.pages
 
-pages.insert_one({'html': r.content})
-'''
+# For rankings without bye weeks
+# currently set for 2018 buy weeks
+bye_sched = {'NYJ':4, 'SF':4, 'DET':5, 'MIA':5, 'BUF':6, 'CHI':6, 'IND':6,
+			'OAK':6, 'CAR':7, 'CLE':7, 'PIT':7, 'TB':7, 'BAL':8, 'DAL':8,
+			'ATL':9, 'CIN':9, 'LAR':9, 'NO':9, 'DEN':10, 'HOU':10, 'JAC':10, 'NE':10,
+			'PHI':10, 'WAS':10, 'GB':11, 'NYG':11, 'SEA':11, 'TEN':11, 'ARI':12,
+			'KC':12, 'LAC':12, 'MIN':12, 'FA':8}
 
 soup = BeautifulSoup(r.content, "lxml")
 
@@ -44,32 +45,23 @@ for i in ranks:
 	copy_erow = copy.copy(empty_row)
 	pr = i.find_all('td')
 	if pr[0].string is not None:
-		temp_string = pr[0].string.split(' ')
-		copy_erow['rank'] = int(temp_string[0].strip('.'))
-		copy_erow['player'] = temp_string[1] + ' ' + temp_string[2]
+		temp_string = pr[0].string.split('. ')
+		copy_erow['player'] = temp_string[1].strip()
+		copy_erow['rank'] = temp_string[0] 
 	else:
-		copy_erow['rank'] = int(pr[0].contents[0].string.strip('. '))
 		copy_erow['player'] = pr[0].find('a').string
+		copy_erow['rank'] = pr[0].contents[0].strip('. ')
 
-	copy_erow['team'] = pr[1].string
-	copy_erow['pos'] = pr[2].string
-	copy_erow['bye'] = pr[3].string
-
-
-# This is for 2015 pre season rankings, formatted differently 
-	'''
-	if pr[3].string[:3] == 'DST':
-		copy_erow['pos'] = pr[3].string[:3]
-	else:
-		copy_erow['pos'] = pr[3].string[:2]
-	'''
+	copy_erow['team'] = pr[2].string.strip()
+	copy_erow['pos'] = pr[1].string.strip()
+	copy_erow['bye'] = bye_sched[pr[2].string.strip()]
 
 	all_rows.append(copy_erow)
 
 scrape_result=pd.DataFrame(all_rows)
 
 
-scrape_result.to_csv('data/pre_draft_rank/espn_rankings_16_BYE.csv', index=False)
+scrape_result.to_csv('data/pre_draft_rank/espn_rankings_18_BYE.csv', index=False)
 
 print('done')
 
