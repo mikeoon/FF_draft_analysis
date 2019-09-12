@@ -110,6 +110,11 @@ class createLeague():
 	def get_standings(self):
 		return [(team, record) for team, record in self.standings.items()]
 
+	def get_pttotals(self):
+		totals = []
+		for team, roster in self.league.items():
+			totals.append((team, roster.get_totalpoints()))
+		return totals
 
 # Sims 1 matchup, pass in the matchups via two lists
 	def sim_matchup(self, div1, div2, wk):
