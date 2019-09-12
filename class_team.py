@@ -67,14 +67,14 @@ class ffTeam():
 
 
 # Returns player from the roster, best available
-	def get_player(self, pos, playing=True):
+	def get_player(self, pos, bye=False):
 		slot = self.count[pos]
-		if playing:
+		if bye:
 			self.count[pos]+=1
 			return self.roster[pos][slot]
 		else:
+			return self.roster[pos][slot]
 			self.count[pos]+=1
-			return self.roster[pos][len(self.roster[pos]) - 1]
 		
 	def clear_count(self):
 		self.count ={'WR': 0, 'RB': 0, 
@@ -136,6 +136,13 @@ class ffTeam():
 
 	def get_byes(self):
 		return self.byes
+
+# Returns the players on bye for that week. If none, returns None
+	def get_weekbye(self, wk):
+		if wk in self.byes.keys():
+			return self.byes[wk]
+		else:
+			return None
 
 
 

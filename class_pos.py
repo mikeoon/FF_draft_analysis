@@ -45,6 +45,8 @@ class ffPlayer():
 	def get_bye(self):
 		return self.bye
 
+	def get_team(self):
+		return self.team
 
 
 

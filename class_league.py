@@ -27,7 +27,6 @@ class createLeague():
 # Reads in CSV file of predraft/season ranks
 	def get_ranks(self, year):
 		return pd.read_csv(f'data/pre_draft_rank/espn_rankings_{year}_BYE.csv')
-		
 
 # Creates the number of teams in the league from specified number
 # Default is the minium which is set to 8
@@ -105,49 +104,57 @@ class createLeague():
 		for a, b in zip(div1, div2):
 			a_score, b_score = 0, 0
 			a_roster, b_roster = [], []
+			a_bye = self.league[a].get_weekbye(wk)
+			b_bye = self.league[b].get_weekbye(wk)
 
 			for pos in self.starting:
-
 				pa = self.league[a].get_player(pos)
 				pb = self.league[b].get_player(pos)
+				
+
+				# Check to see if player is on bye
+				if a_bye is not None:
+					if pa.get_name() in a_bye:
+						pa = self.league[a].get_player(pos, True)
+
+				if b_bye is not None:
+					if pb.get_name() in b_bye:
+						pb = self.league[b].get_player(pos, True)
 
 				week = self.ppts[f'w{wk}']
 
 				pas = week[week['Player'] == pa.get_name()]
 				pbs = week[week['Player'] == pb.get_name()]
 
-			# This is hard coded to players that are injured
-				if pas['Player'].count() == 0 or pa.get_name() in a_roster:
-					pa = self.league[a].get_player(pos, False)
-					pas = week[week['Player'] == pa.get_name()]
+				# Do i need this?
+				if pa.get_name() in a_roster:
+						pa = self.league[a].get_player(pos, False)
+						pas = week[week['Player'] == pa.get_name()]
 
-				if pbs['Player'].count() == 0 or pb.get_name() in b_roster:
+				# Do i need this?
+				if pb.get_name() in b_roster:
 					pb = self.league[b].get_player(pos, False)
 					pbs = week[week['Player'] == pb.get_name()]
 
-			# add new player
-				while pas['Player'].count() == 0 or pa.get_name() in a_roster:
-					self.league[a].drop_player(pa)
-					self.replace_player(pa.get_pos(), a)
-					pa = self.league[a].get_player(pos)
-					pas = week[week['Player'] == pb.get_name()]
+				if pas['Player'].count() == 0 and pbs['Player'].count() != 0:
+					a_pos_score, b_pos_score = 0, pbs['Points'].iloc[0]
+				elif pbs['Player'].count() == 0 and pas['Player'].count() != 0:
+					b_pos_score, a_pos_score = 0, pas['Points'].iloc[0]
+				elif pbs['Player'].count() == 0 and pas['Player'].count() == 0:
+					a_pos_score, b_pos_score = 0, 0
+				else:
+					a_pos_score, b_pos_score = pas['Points'].iloc[0], pbs['Points'].iloc[0]
 
-
-				while pbs['Player'].count() == 0 or pb.get_name() in b_roster:
-					self.league[b].drop_player(pb)
-					self.replace_player(pa.get_pos(), b)
-					pb = self.league[b].get_player(pos)
-					pbs = week[week['Player'] == pb.get_name()]
-
-				a_score, b_score = a_score + pas['Points'].iloc[0], b_score + pbs['Points'].iloc[0]
+				a_score, b_score = a_score + a_pos_score, b_score + b_pos_score
 				
 			# Creating roster to save for the teams per matchup
-				a_roster.append((pas['Player'].iloc[0], pas['Points'].iloc[0]))
-				b_roster.append((pbs['Player'].iloc[0], pbs['Points'].iloc[0]))
+				a_roster.append((pa.get_name(), a_pos_score))
+				b_roster.append((pb.get_name(), b_pos_score))
 
 			# Tracking point totals for that player
-				pa.add_points(pas['Points'].iloc[0])
-				pb.add_points(pbs['Points'].iloc[0])
+				pa.add_points(a_pos_score)
+				pb.add_points(b_pos_score)
+
 
 
 		# Right now, hard coded to favor team B if the sores are equal
@@ -171,24 +178,8 @@ class createLeague():
 			self.league[a].record_lineup(a_roster, wk)
 			self.league[b].record_lineup(b_roster, wk)
 
-		# Clear team's counts so it can count for another matchup
 			self.league[a].clear_count()
 			self.league[b].clear_count()
-
-		# Helper print messages to see one matchup
-		# Delete when running through them all
-		'''
-			print(f'This is {a} vs {b}')
-			print(f'{a}')
-			print(f'Score: {a_score}')
-			print(f'Lineup: {a_roster}')
-			print()
-			print(f'{b}')
-			print(f'Score: {b_score}')
-			print(f'Lineup: {b_roster}')
-			print(f'Winner is: {winner}')
-			print()
-		'''
 
 
 		
@@ -205,12 +196,16 @@ class createLeague():
 
 		return season_data	
 
-	def replace_player(self, pos, team):
-		pick = self.rankings[self.rankings['pos'] == pos]
+# This is extremely broken, not working yet
+	def replace_player(self, player, team):
+		pick = self.rankings[self.rankings['pos'] == player.get_pos()]
 		replace = pick[pick['rank'] == pick['rank'].min()]
+		
+
 		self.league[team].add_roster(p.ffPlayer(replace['player'].iloc[0], replace['pos'].iloc[0], replace['team'].iloc[0],
 												replace['rank'].iloc[0], replace['bye'].iloc[0]))
-		self.rankings.drop(replace.index, inplace=True)
+		self.rankings = self.rankings.append(pd.Series({'player' : player.get_name(),'pos' : player.get_pos(), 'team':player.get_team(),'rank':player.get_rank(),'bye':player.get_bye()}, name='rank') )
+		self.rankings = self.rankings.drop(replace.index)
 
 
 	def report_replaced(self):
