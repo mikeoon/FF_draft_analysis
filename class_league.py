@@ -75,16 +75,29 @@ class createLeague():
 		picks = ['WR','WR', 'WR', 'WR', 'RB', 'RB', 'RB', 'RB', 'QB',
 				'QB', 'TE', 'TE', 'K', 'K',
 				'DST', 'DST']
-
+		snake = False
 		for pi in picks:
-			for t in range(len(self.dorder)):
-				team = self.dorder[t]
+			if snake == True:
+				for t in reversed(range(len(self.dorder))):
+					team = self.dorder[t]
 
-				pick = self.rankings[self.rankings['pos'] == pi]
-				pick = pick[pick['rank'] == pick['rank'].min()]
-				self.league[team].add_roster(p.ffPlayer(pick['player'].iloc[0], pick['pos'].iloc[0], pick['team'].iloc[0], 
-														pick['rank'].iloc[0], pick['bye'].iloc[0]))
-				self.rankings.drop(pick.index, inplace=True)
+					pick = self.rankings[self.rankings['pos'] == pi]
+					pick = pick[pick['rank'] == pick['rank'].min()]
+					self.league[team].add_roster(p.ffPlayer(pick['player'].iloc[0], pick['pos'].iloc[0], pick['team'].iloc[0], 
+															pick['rank'].iloc[0], pick['bye'].iloc[0]))
+					self.rankings.drop(pick.index, inplace=True)
+				snake=False
+			elif snake == False:
+				for t in range(len(self.dorder)):
+					team = self.dorder[t]
+
+					pick = self.rankings[self.rankings['pos'] == pi]
+					pick = pick[pick['rank'] == pick['rank'].min()]
+					self.league[team].add_roster(p.ffPlayer(pick['player'].iloc[0], pick['pos'].iloc[0], pick['team'].iloc[0], 
+															pick['rank'].iloc[0], pick['bye'].iloc[0]))
+					self.rankings.drop(pick.index, inplace=True)
+				snake=True
+
 
 # Checks to see if draft is complete, True = Complete, all team rosters full
 	def complete_draft(self):
