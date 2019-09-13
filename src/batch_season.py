@@ -1,11 +1,9 @@
-import numpy as np
 import copy
 import pandas as pd
-import class_pos as cp
-import read_season_data as rsd
-import class_team as ct
-import class_league as cleague
-import json
+import src.class_pos as cp
+import src.read_season_data as rsd
+import src.class_team as ct
+import src.class_league as cleague
 
 
 # Hard code schedule

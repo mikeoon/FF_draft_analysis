@@ -1,7 +1,7 @@
 import pandas as pd
 import random as rand
-import class_team as team
-import class_pos as p
+import src.class_team as team
+import src.class_pos as p
 import copy
 
 

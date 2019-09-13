@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import batch_season as bseason
+import src.batch_season as bseason
 
 # Batch seasons here
 bseason.sim_seasons(18, 'custom_draft', num_sim=1000)
