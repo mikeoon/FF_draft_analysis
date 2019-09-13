@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 import random as rand
 import class_team as team
@@ -20,6 +19,7 @@ class createLeague():
 		self.starting = ['QB', 'WR', 'WR', 'RB', 'RB', 'TE', 'DST', 'K']
 		# Standings are in form [W, L, T]
 		self.standings = None
+		self.drft_rnds = 16
 
 
 
@@ -68,20 +68,23 @@ class createLeague():
 			while len(self.dorder) != self.num_teams:
 				pick = rand.choice(temp)
 				self.dorder.append(pick)
+				self.league[pick].set_dftpos(len(self.dorder))
 				temp.pop(temp.index(pick))
+
+	def set_dftpicks(self, picks):
+		for team, dftpicks in zip(self.league.keys(), picks):
+			self.league[team].set_dftpicks(dftpicks)
+
 
 # For now this is hardcoded to the below picks
 # I should code up something to help with picking the picks
 	def draft(self):
-		picks = ['WR','WR', 'WR', 'WR', 'RB', 'RB', 'RB', 'RB', 'QB',
-				'QB', 'TE', 'TE', 'K', 'K',
-				'DST', 'DST']
 		snake = False
-		for pi in picks:
+		for rnd in range(self.drft_rnds):
 			if snake == True:
 				for t in reversed(range(len(self.dorder))):
 					team = self.dorder[t]
-
+					pi = self.league[team].get_dftpicks()[rnd]
 					pick = self.rankings[self.rankings['pos'] == pi]
 					pick = pick[pick['rank'] == pick['rank'].min()]
 					self.league[team].add_roster(p.ffPlayer(pick['player'].iloc[0], pick['pos'].iloc[0], pick['team'].iloc[0], 
@@ -91,6 +94,7 @@ class createLeague():
 			elif snake == False:
 				for t in range(len(self.dorder)):
 					team = self.dorder[t]
+					pi = self.league[team].get_dftpicks()[rnd]
 
 					pick = self.rankings[self.rankings['pos'] == pi]
 					pick = pick[pick['rank'] == pick['rank'].min()]
@@ -248,6 +252,7 @@ class createLeague():
 			report.append(f'{team} replaced {inj}')
 		return report
 
+# Returns the bye weeks for teams
 	def get_byes(self):
 		byes = []
 		for team, roster in self.league.items():

@@ -28,17 +28,27 @@ wk12 = (['team1', 'team2', 'team5', 'team6'], ['team4', 'team3', 'team8', 'team7
 wk13 = (['team1', 'team3', 'team5', 'team7'], ['team2', 'team4', 'team6', 'team8'])
 
 
-['WR','WR', 'WR', 'WR', 'RB', 'RB', 'RB', 'RB', 'QB','QB', 'TE', 'TE', 'DST', 'K', 'DST', 'K']
+team1_picks = ['WR','WR', 'WR', 'WR', 'RB', 'RB', 'RB', 'RB', 'QB','QB', 'TE', 'TE', 'DST', 'K', 'DST', 'K']
+team2_picks = ['WR','RB', 'WR', 'RB', 'WR', 'RB', 'WR', 'RB', 'QB','TE', 'QB', 'TE', 'DST', 'K', 'DST', 'K']
+team3_picks = ['RB','WR', 'RB', 'WR', 'RB', 'WR', 'RB', 'WR', 'QB','QB', 'TE', 'TE', 'DST', 'K', 'DST', 'K']
+team4_picks = ['WR','WR', 'WR', 'RB', 'WR', 'RB', 'RB', 'RB', 'QB','QB', 'TE', 'TE', 'DST', 'K', 'DST', 'K']
+team5_picks = ['RB','RB', 'RB', 'RB', 'WR', 'WR', 'WR', 'WR', 'QB','QB', 'TE', 'TE', 'DST', 'K', 'DST', 'K']
+team6_picks = ['WR','RB', 'QB', 'WR', 'TE', 'RB', 'RB', 'RB', 'WR','QB', 'RB', 'TE', 'DST', 'K', 'DST', 'K']
+team7_picks = ['RB','RB', 'WR', 'WR', 'RB', 'RB', 'WR', 'WR', 'QB','QB', 'TE', 'TE', 'DST', 'K', 'DST', 'K']
+team8_picks = ['WR','RB', 'WR', 'WR', 'WR', 'QB', 'TE', 'RB', 'RB','QB', 'RB', 'TE', 'DST', 'K', 'DST', 'K']
+
 
 
 
 
 def sim_seasons(year, name_sim='default', num_sim=1):
 	schedule = [wk1, wk2, wk3, wk4, wk5, wk6, wk7, wk8, wk9, wk10, wk11, wk12, wk13]
+	team_picks = [team1_picks, team2_picks, team3_picks, team4_picks, team5_picks, team6_picks, team7_picks, team8_picks]
 	sim_data = []
 	for _ in range(num_sim):
 		season = cleague.createLeague(year)
 		season.create_teams()
+		season.set_dftpicks(team_picks)
 		season.set_draftorder()
 		season.draft()
 

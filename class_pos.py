@@ -1,5 +1,3 @@
-import numpy as np
-
 # This creates a FF player
 # Makes it easier to distinguish their name, pos, team, rank, 
 #and which ff team they are on
@@ -42,9 +40,10 @@ class ffPlayer():
 	def get_pointtotal(self):
 		return self.point_total
 
+# Returns the bye week for the player
 	def get_bye(self):
 		return self.bye
-
+# Returns team the player plays for
 	def get_team(self):
 		return self.team
 
