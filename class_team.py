@@ -1,5 +1,3 @@
-import numpy as np
-
 # Creates each team, only needs the team name to initialize
 # Keeps track of how full the roster is and what positions you have
 # Also has total points, current standings, and points for the week
@@ -41,6 +39,10 @@ class ffTeam():
 # Sets the draft order for the team
 	def set_dftpicks(self, picks):
 		self.dft_picks = picks
+
+# Returns the draft pick pos, index by round
+	def get_dftpicks(self):
+		return self.dft_picks
 
 # Sets the draft poition for the team
 	def set_dftpos(self, pos):
@@ -86,7 +88,8 @@ class ffTeam():
 		else:
 			return self.roster[pos][slot]
 			self.count[pos]+=1
-		
+
+# Clears count for next matchup
 	def clear_count(self):
 		self.count ={'WR': 0, 'RB': 0, 
 					'QB' : 0, 'TE' : 0, 
@@ -137,6 +140,7 @@ class ffTeam():
 	def set_weekscore(self, score,  wk):
 		self.week_score[f'wk{wk}'] = score
 
+# Sets standing for the regular season
 	def set_standing(self, stnd):
 		self.standing = stnd
 
