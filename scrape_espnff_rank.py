@@ -1,18 +1,12 @@
-import copy
-import pandas as pd
-from pymongo import MongoClient
-import pprint
-
-
-# Requests sends and recieves HTTP requests.
+import re
 import requests
-
-# Beautiful Soup parses HTML documents in python.
+import pandas as pd
 from bs4 import BeautifulSoup
 
 
-
-espn = 'https://www.espn.com/fantasy/football/story/_/page/18RanksPreseason300nonPPR/2018-fantasy-football-non-ppr-rankings-top-300'
+# Currently set to scraping the 2017 predraft rankings
+espn = 'https://www.espn.com/fantasy/football/story/_/page/17RanksPreseason200nonPPR/2017-fantasy-football-standard-rankings-non-ppr-top-200'
+season='17'
 r = requests.get(espn)
 
 print(r)
@@ -28,11 +22,12 @@ bye_sched = {'NYJ':4, 'SF':4, 'DET':5, 'MIA':5, 'BUF':6, 'CHI':6, 'IND':6,
 
 soup = BeautifulSoup(r.content, "lxml")
 
-table = soup.find_all('aside', {'class' : 'inline inline-table'}, limit=2)
+#table = soup.find_all('aside', {'class' : 'inline inline-table'}, limit=2)
 
+table = soup.find_all('table', {'class' : 'inline-table'}, limit=2)
 # table[1] is where the overall data is
-tr = table[1].find('table', {'class' : 'inline-table'})
-plist = tr.find('tbody')
+#tr = table[1].find('table', {'class' : 'inline-table'})
+plist = table[1].find('tbody')
 ranks = plist.find_all('tr', {'class' : 'last'})
 
 
@@ -41,27 +36,23 @@ all_rows=[]
 
 empty_row = {'rank': None, 'player' : None, 'team' : None, 'pos' : None, 'bye' : None}
 
-for i in ranks:
-	copy_erow = copy.copy(empty_row)
-	pr = i.find_all('td')
-	if pr[0].string is not None:
-		temp_string = pr[0].string.split('. ')
-		copy_erow['player'] = temp_string[1].strip()
-		copy_erow['rank'] = temp_string[0] 
-	else:
-		copy_erow['player'] = pr[0].find('a').string
-		copy_erow['rank'] = pr[0].contents[0].strip('. ')
-
-	copy_erow['team'] = pr[2].string.strip()
-	copy_erow['pos'] = pr[1].string.strip()
-	copy_erow['bye'] = bye_sched[pr[2].string.strip()]
+for row in ranks:
+	copy_erow = empty_row.copy()
+	player_info =  row.find_all('td')
+	first = re.split('\d{1,}\.', player_info[0].text)
+	second = first[1].split(', ')
+	copy_erow['player'] = second[0].strip()
+	copy_erow['rank'] = re.match('\d{1,}\.', player_info[0].text)[0].strip('. ')
+	copy_erow['pos'] = second[1].strip().replace('/', '') # Replace is here for D/ST change to DST
+	copy_erow['bye'] = player_info[2].text.strip()
+	copy_erow['team'] = second[2].strip()
 
 	all_rows.append(copy_erow)
 
 scrape_result=pd.DataFrame(all_rows)
 
-
-scrape_result.to_csv('data/pre_draft_rank/espn_rankings_18_BYE.csv', index=False)
+print(scrape_result.head())
+scrape_result.to_csv(f'data/pre_draft_rank/espn_rankings_{season}_BYE.csv', index=False)
 
 print('done')
 
