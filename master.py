@@ -3,7 +3,8 @@ import pandas as pd
 import src.batch_season as bseason
 
 # Batch seasons here
-bseason.sim_seasons(18, 'custom_draft', num_sim=1000)
+# Only the 2015, 2016, 2018 seasons are working
+bseason.sim_seasons(15, 'custom_draft')
 
 # read in stats from simmed season
 a = pd.read_csv('data/season_sim_18/sim_custom_draft.csv', index_col=0)
